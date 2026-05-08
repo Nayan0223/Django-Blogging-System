@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="search-results-page">
+        <h1>Search Results</h1>
+
+        {% if query %}
+        <p>Search results for: <strong>"{{ query }}"</strong></p>
+        {% endif %}
+
+        {% if posts %}
+        <div class="blog-grid">
+            {% for post in posts %}
+            <article class="card">
+                <div class="card-image">
+                    {% load static %}
+                    <img src="{% if post.image %}{{ post.image.url }}{% else %}{% static 'images/default-post.png' %}{% endif %}"
+                        alt="{{ post.title }}">
+                    <span class="category">{{ post.category.name|default:"Uncategorized" }}</span>
+                </div>
+                <div class="card-content">
+                    <div class="card-meta">
+                        {{ post.created_at|date:"M d, Y" }} • <a
+                            href="{% url 'user_public_profile' post.author.username %}"
+                            style="text-decoration: none; color: inherit;">{{ post.author.username }}</a>
+                    </div>
+                    <h3><a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a></h3>
+                    <p>{{ post.content|striptags|safe|truncatewords:20 }}</p>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="no-results">
+            <p>No posts found matching your search.</p>
+            <a href="{% url 'home' %}" class="btn-primary">Back to Home</a>
+        </div>
+        {% endif %}
+        {% include 'includes/pagination.html' %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,155 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block admin_content %}
+<div class="admin-section" style="max-width: 800px; margin: 0 auto;">
+
+    <!-- Header -->
+    <div class="section-header"
+        style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h2 style="font-family: 'Playfair Display', serif; font-size: 2rem; color: #1e293b; margin-bottom: 0.5rem;">
+                Edit User</h2>
+            <p style="color: #64748b;">Update profile information and permissions for <strong
+                    style="color: #4f46e5;">@{{ user_obj.username }}</strong></p>
+        </div>
+        <a href="{% url 'admin_users' %}"
+            style="display: flex; align-items: center; gap: 0.5rem; color: #64748b; text-decoration: none; font-weight: 500; transition: color 0.2s;">
+            <i class="fas fa-arrow-left"></i> Back to Users
+        </a>
+    </div>
+
+    <!-- Main Card -->
+    <div
+        style="background: white; border-radius: 16px; padding: 2.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); border: 1px solid #f1f5f9;">
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <!-- User Info Section -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2.5rem;">
+                <div>
+                    <label
+                        style="display: block; margin-bottom: 0.75rem; color: #334155; font-weight: 600; font-size: 0.95rem;">Username</label>
+                    <div style="position: relative;">
+                        <span
+                            style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #94a3b8;"><i
+                                class="fas fa-user"></i></span>
+                        <input type="text" name="username" value="{{ user_obj.username }}" required
+                            style="width: 100%; padding: 0.875rem 1rem 0.875rem 2.75rem; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 1rem; color: #1e293b; transition: all 0.2s; outline: none;"
+                            onfocus="this.style.borderColor='#4f46e5'; this.style.boxShadow='0 0 0 3px rgba(79, 70, 229, 0.1)';"
+                            onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none';">
+                    </div>
+                </div>
+
+                <div>
+                    <label
+                        style="display: block; margin-bottom: 0.75rem; color: #334155; font-weight: 600; font-size: 0.95rem;">Email
+                        Address</label>
+                    <div style="position: relative;">
+                        <span
+                            style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #94a3b8;"><i
+                                class="fas fa-envelope"></i></span>
+                        <input type="email" name="email" value="{{ user_obj.email }}"
+                            style="width: 100%; padding: 0.875rem 1rem 0.875rem 2.75rem; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 1rem; color: #1e293b; transition: all 0.2s; outline: none;"
+                            onfocus="this.style.borderColor='#4f46e5'; this.style.boxShadow='0 0 0 3px rgba(79, 70, 229, 0.1)';"
+                            onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none';">
+                    </div>
+                </div>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid #f1f5f9; margin-bottom: 2.5rem;">
+
+            <!-- Permissions Section -->
+            <div style="margin-bottom: 2.5rem;">
+                <h4 style="margin-bottom: 1.5rem; font-size: 1.1rem; color: #1e293b; font-weight: 700;">Permissions &
+                    Access</h4>
+
+                <div style="background: #f8fafc; border-radius: 12px; padding: 1.5rem; border: 1px solid #e2e8f0;">
+
+                    <!-- Active Logic -->
+                    <div
+                        style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+                        <div>
+                            <div style="font-weight: 600; color: #334155; margin-bottom: 0.25rem;">Active Account</div>
+                            <div style="font-size: 0.9rem; color: #64748b;">Allow this user to log in to the platform.
+                            </div>
+                        </div>
+                        <label class="switch"
+                            style="position: relative; display: inline-block; width: 50px; height: 26px;">
+                            <input type="checkbox" name="is_active" {% if user_obj.is_active %}checked{% endif %}
+                                style="opacity: 0; width: 0; height: 0;">
+                            <span class="slider"
+                                style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .4s; border-radius: 34px;"></span>
+                            <span class="slider-before"
+                                style="position: absolute; content: ''; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;"></span>
+                        </label>
+                    </div>
+
+                    <hr style="border: 0; border-top: 1px solid #e2e8f0; margin-bottom: 1.5rem;">
+
+                    <!-- Superuser Logic -->
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <div>
+                            <div style="font-weight: 600; color: #334155; margin-bottom: 0.25rem;">Administrator Access
+                            </div>
+                            <div style="font-size: 0.9rem; color: #64748b;">Grant full access to the admin dashboard.
+                            </div>
+                        </div>
+                        <label class="switch"
+                            style="position: relative; display: inline-block; width: 50px; height: 26px;">
+                            <input type="checkbox" name="is_superuser" {% if user_obj.is_superuser %}checked{% endif %}
+                                style="opacity: 0; width: 0; height: 0;">
+                            <span class="slider"
+                                style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .4s; border-radius: 34px;"></span>
+                            <span class="slider-before"
+                                style="position: absolute; content: ''; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;"></span>
+                        </label>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                <button type="submit" class="btn-primary"
+                    style="padding: 0.875rem 2rem; background: #4f46e5; color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; transition: background 0.2s; font-size: 1rem;">
+                    Save Changes
+                </button>
+                <a href="{% url 'admin_change_user_password' user_obj.pk %}" style="padding: 0.875rem 1.5rem; background: #f5f3ff; color: #7c3aed; text-decoration: none;
+                        font-weight: 600; border-radius: 10px; border: 1px solid #ede9fe; display: flex;
+                        align-items: center; gap: 0.4rem; transition: background 0.2s;"
+                    onmouseover="this.style.background='#ede9fe';" onmouseout="this.style.background='#f5f3ff';">
+                    <i class="fas fa-key"></i> Change Password
+                </a>
+                <a href="{% url 'admin_users' %}"
+                    style="padding: 0.875rem 1.5rem; color: #64748b; text-decoration: none; font-weight: 500;">Cancel</a>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<style>
+    /* Inline toggle styles for the switch */
+    input:checked+.slider {
+        background-color: #4f46e5 !important;
+    }
+
+
+    /* Creating the 'before' element via CSS block in file to ensure it works */
+    .slider-before {
+        position: absolute;
+        height: 20px;
+        width: 20px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+    input:checked~.slider-before {
+        transform: translateX(24px);
+    }
+</style>
+{% endblock %}

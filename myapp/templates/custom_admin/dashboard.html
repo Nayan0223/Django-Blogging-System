@@ -1,0 +1,179 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block admin_content %}
+<div class="admin-header">
+    <h1>Admin Dashboard</h1>
+    <div class="header-actions">
+        <a href="{% url 'create_post' %}" class="btn-sm"><i class="fas fa-plus"></i> New Post</a>
+    </div>
+</div>
+
+<!-- Stats Grid -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon users">
+            <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-details">
+            <h3>Users</h3>
+            <div class="stat-number">{{ total_users }}</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon posts">
+            <i class="fas fa-newspaper"></i>
+        </div>
+        <div class="stat-details">
+            <h3>Posts</h3>
+            <div class="stat-number">{{ total_posts }}</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon comments">
+            <i class="fas fa-comments"></i>
+        </div>
+        <div class="stat-details">
+            <h3>Comments</h3>
+            <div class="stat-number">{{ total_comments }}</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon subscribers" style="background: #e0e7ff; color: #4338ca;">
+            <i class="fas fa-envelope"></i>
+        </div>
+        <div class="stat-details">
+            <h3>Subscribers</h3>
+            <div class="stat-number">{{ total_subscribers }}</div>
+        </div>
+    </div>
+
+    <!-- Total Likes Card -->
+    <div class="stat-card">
+        <div class="stat-icon likes" style="background: #ffe4e6; color: #e11d48;">
+            <i class="fas fa-heart"></i>
+        </div>
+        <div class="stat-details">
+            <h3>Total Likes</h3>
+            <div class="stat-number">{{ total_likes }}</div>
+        </div>
+    </div>
+
+
+
+    <div class="stat-card">
+        <div class="stat-icon views">
+            <i class="fas fa-eye"></i>
+        </div>
+        <div class="stat-details">
+            <h3>Total Views</h3>
+            <!-- Sum of all post views logic could be done in view, 
+                 for now we can just show a placeholder or calculate it. 
+                 Let's stick to the card structure but maybe remove the hardcoded number 
+                 if we calculated it in view. For now I will leave it or we can add total_views to context later. -->
+            <div class="stat-number"> -- </div>
+        </div>
+    </div>
+</div>
+
+<!-- Popular Posts Section -->
+<div class="admin-section">
+    <div class="section-header">
+        <h2>Popular Posts</h2>
+    </div>
+    <div class="table-container">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Post Title</th>
+                    <th>Category</th>
+                    <th>Views</th>
+                    <th>Published</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for post in popular_posts %}
+                <tr>
+                    <td><a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a></td>
+                    <td>{{ post.category.name }}</td>
+                    <td>{{ post.views_count }}</td>
+                    <td>{{ post.created_at|date:"M d, Y" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">No posts yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- User Management Section -->
+<div class="admin-section">
+    <div class="section-header">
+        <h2>User Management</h2>
+    </div>
+
+    <div class="table-container">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user_obj in latest_users %}
+                <tr>
+                    <td>#{{ user_obj.id|stringformat:"03d" }}</td>
+                    <td>
+                        <div class="user-cell">
+                            <strong>{{ user_obj.username }}</strong>
+                        </div>
+                    </td>
+                    <td>{{ user_obj.email|default:"No email" }}</td>
+                    <td>
+                        {% if user_obj.is_superuser %}
+                        <span class="role-badge admin">Admin</span>
+                        {% else %}
+                        <span class="role-badge author">Author</span>
+                        {% endif %}
+                    </td>
+                    <td><span class="status-badge active">Active</span></td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-icon edit"><i class="fas fa-edit"></i></button>
+                            <button class="btn-icon delete"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Post Control Section -->
+<div class="admin-section">
+    <div class="section-header">
+        <h2>Post Control</h2>
+        <form action="{% url 'admin_post_list' %}" method="get" class="filter-controls">
+            <input type="text" name="q" placeholder="Search posts..." class="search-input">
+            <select name="status" class="status-select">
+                <option value="">All Status</option>
+                <option value="published">Published</option>
+                <option value="draft">Draft</option>
+            </select>
+            <button type="submit" class="btn-sm" style="display: none;">Search</button>
+        </form>
+    </div>
+    <!-- ... post table matching user table structure ... -->
+</div>
+{% endblock %}

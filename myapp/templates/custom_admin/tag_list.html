@@ -1,0 +1,66 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block admin_content %}
+<div class="admin-section">
+    <div class="section-header">
+        <h2>Tag Management</h2>
+        <form method="get" style="display:flex; align-items:center;">
+            <input type="text" name="q" placeholder="Search tags..." value="{{ search_query }}"
+                style="padding:8px 12px; border:1px solid #e2e8f0; border-radius:6px;">
+        </form>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
+        <!-- Tag List -->
+        <div class="table-container">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Slug</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tag in tags %}
+                    <tr>
+                        <td>#{{ tag.id }}</td>
+                        <td><strong>{{ tag.name }}</strong></td>
+                        <td><span class="status-badge" style="background: #f1f5f9; color: #64748b;">{{ tag.slug }}</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="{% url 'admin_delete_tag' tag.pk %}" class="btn-icon delete"
+                                    title="Delete"
+                                    onclick="return confirm('Are you sure you want to delete this tag?')"><i
+                                        class="fas fa-trash"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" style="text-align: center;">No tags found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% include 'includes/pagination.html' %}
+
+        <!-- Add Tag Form -->
+        <div
+            style="background: white; padding: 1.5rem; border-radius: 12px; border: 1px solid #e2e8f0; height: fit-content;">
+            <h3 style="margin-bottom: 1rem; color: #1e293b;">Add New Tag</h3>
+            <form method="POST">
+                {% csrf_token %}
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; color: #64748b; font-size: 0.9rem;">Tag Name</label>
+                    <input type="text" name="name" required
+                        style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem;">
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%;">Create Tag</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

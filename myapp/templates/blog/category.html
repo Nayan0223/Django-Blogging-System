@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<header class="hero">
+    <div class="container hero-container">
+        <div class="hero-content">
+            {% if featured_post %}
+            <span class="tag">{{ category.name }}</span>
+            <h1>{{ featured_post.title }}</h1>
+            <p>{{ featured_post.content|striptags|safe|truncatewords:25 }}</p>
+            <a href="{% url 'post_detail' featured_post.pk %}" class="btn-text">Read Article <i
+                    class="fas fa-arrow-right"></i></a>
+            {% else %}
+            {% if is_tag %}
+            <span class="tag">Topic</span>
+            <h1>Explore Posts Tagged "{{ category.name }}"</h1>
+            <p>Discover stories and insights related to #{{ category.name }}.</p>
+            {% else %}
+            <span class="tag">Category</span>
+            <h1>Explore {{ category.name }} Articles</h1>
+            <p>Discover the latest stories and insights in {{ category.name }}.</p>
+            {% endif %}
+            <a href="#posts" class="btn-text">Explore Articles <i class="fas fa-arrow-right"></i></a>
+            {% endif %}
+        </div>
+        <div class="hero-image">
+            {% if featured_post %}
+            <img src="{% if featured_post.image %}{{ featured_post.image.url }}{% else %}{% static 'images/default-post.png' %}{% endif %}"
+                alt="{{ featured_post.title }}">
+            {% else %}
+            <img src="{% static 'images/default-post.png' %}" alt="{{ category.name }}">
+            {% endif %}
+        </div>
+    </div>
+</header>
+
+<div class="container main-layout" id="posts">
+    <main class="blog-grid">
+        {% if posts %}
+        {% for post in posts %}
+        <article class="card">
+            <div class="card-image">
+                <img src="{% if post.image %}{{ post.image.url }}{% else %}{% static 'images/default-post.png' %}{% endif %}"
+                    alt="{{ post.title }}">
+                <span class="category">{{ post.category.name|default:"Uncategorized" }}</span>
+            </div>
+            <div class="card-content">
+                <div class="card-meta">{{ post.created_at|date:"M d, Y" }} • By <a
+                        href="{% url 'user_public_profile' post.author.username %}"
+                        style="text-decoration: none; color: inherit;">{{ post.author.username }}</a></div>
+                <h3><a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a></h3>
+                <p>{{ post.content|striptags|safe|truncatewords:25 }}</p>
+                <a href="{% url 'post_detail' post.pk %}" class="read-more">Read More →</a>
+            </div>
+        </article>
+        {% endfor %}
+        {% else %}
+        <div class="no-posts">
+            <p>No posts found in this category yet. Be the first to share!</p>
+            {% if user.is_authenticated %}
+            <a href="{% url 'create_post' %}" class="btn-primary">Create Post</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </main>
+
+    <aside class="sidebar">
+        <div class="widget">
+            <h4>All Categories</h4>
+            <ul class="cat-list">
+                <!-- Ideally pass all categories here too, or a template tag -->
+                <li><a href="{% url 'home' %}">Back to Home</a></li>
+            </ul>
+        </div>
+
+        {% if user.is_authenticated %}
+        <div class="widget">
+            <h4>Quick Actions</h4>
+            <ul class="action-list">
+                <li><a href="{% url 'create_post' %}" class="btn-primary">Create New Post</a></li>
+                <li><a href="{% url 'my_posts' %}">My Posts</a></li>
+            </ul>
+        </div>
+        {% else %}
+        <div class="widget newsletter-widget">
+            <h4>Join the Newsletter</h4>
+            <p>Get the latest updates directly in your inbox.</p>
+            <form action="{% url 'subscribe' %}" method="post">
+                {% csrf_token %}
+                <input type="email" name="email" placeholder="Your email address" required>
+                <button type="submit" class="btn-primary">Sign Up</button>
+            </form>
+        </div>
+        {% endif %}
+    </aside>
+</div>
+
+{% endblock %}

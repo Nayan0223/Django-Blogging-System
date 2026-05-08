@@ -1,0 +1,29 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block dashboard_content %}
+<div class="dash-card">
+    <h1 class="dash-page-title">My Comments</h1>
+
+    {% if comments %}
+    <div class="activity-list">
+        {% for comment in comments %}
+        <div class="activity-item">
+            <span class="activity-title">On: {{ comment.post.title }}</span>
+            <span class="activity-date">{{ comment.created_at|date:"M d, Y" }}</span>
+            <span class="activity-status {% if comment.is_approved %}published{% else %}draft{% endif %}">
+                {% if comment.is_approved %}Approved{% else %}Pending{% endif %}
+            </span>
+            <div class="comment-preview"
+                style="width: 100%; margin-top: 5px; color: var(--text-muted); font-size: 0.9rem;">
+                {{ comment.content|truncatechars:100 }}
+            </div>
+            <a href="{% url 'post_detail' comment.post.pk %}" class="edit-link">View Post</a>
+        </div>
+        {% endfor %}
+    </div>
+    {% include 'includes/pagination.html' %}
+    {% else %}
+    <p class="no-activity">You haven't commented on any posts yet.</p>
+    {% endif %}
+</div>
+{% endblock dashboard_content %}

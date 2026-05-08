@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- Hero/Featured Section -->
+<header class="hero">
+    <div class="container hero-container">
+        <div class="hero-content">
+            {% if posts %}
+            {% with posts|first as featured_post %}
+            <span class="tag">Featured</span>
+            <h1>{{ featured_post.title }}</h1>
+            <p>{{ featured_post.content|striptags|safe|truncatewords:25 }}</p>
+            <a href="{% url 'post_detail' featured_post.pk %}" class="btn-text">Read Article <i
+                    class="fas fa-arrow-right"></i></a>
+            {% endwith %}
+            {% else %}
+            <span class="tag">Featured</span>
+            <h1>The Future of Web Design is Minimalist & Fast</h1>
+            <p>Explore how modern aesthetics are merging with high performance to create the next generation of digital
+                experiences.</p>
+            <a href="#" class="btn-text">Read Article <i class="fas fa-arrow-right"></i></a>
+            {% endif %}
+        </div>
+        <div class="hero-image">
+            {% if posts %}
+            {% with posts|first as featured_post %}
+            <img src="{% if featured_post.image %}{{ featured_post.image.url }}{% else %}{% static 'images/default-post.png' %}{% endif %}"
+                alt="{{ featured_post.title }}">
+            {% endwith %}
+            {% else %}
+            <img src="{% static 'images/default-post.png' %}" alt="Hero Image">
+            {% endif %}
+        </div>
+    </div>
+</header>
+
+<div class="container main-layout">
+    <div class="content-wrapper">
+        <main class="blog-grid">
+            {% if posts %}
+            {% for post in posts|slice:"1:" %}
+            <article class="card">
+                <div class="card-image">
+                    <img src="{% if post.image %}{{ post.image.url }}{% else %}{% static 'images/default-post.png' %}{% endif %}"
+                        alt="{{ post.title }}">
+                    <span class="category">{{ post.category.name|default:"Uncategorized" }}</span>
+                </div>
+                <div class="card-content">
+                    <div class="card-meta">{{ post.created_at|date:"M d, Y" }} • <a
+                            href="{% url 'user_public_profile' post.author.username %}"
+                            style="text-decoration: none; color: inherit;">{{ post.author.username }}</a></div>
+                    <h3><a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a></h3>
+                    <p>{{ post.content|striptags|safe|truncatewords:20 }}</p>
+                </div>
+            </article>
+            {% endfor %}
+            {% else %}
+            <article class="card">
+                <div class="card-image">
+                    <img src="{% static 'images/tech-hero.png' %}" alt="Blog Post">
+                    <span class="category">Tech</span>
+                </div>
+                <div class="card-content">
+                    <div class="card-meta">Dec 08, 2025 • 5 min read</div>
+                    <h3><a href="#">Understanding CSS Grid in 2025</a></h3>
+                    <p>A comprehensive guide to mastering layout systems in modern web development.</p>
+                </div>
+            </article>
+
+            <article class="card">
+                <div class="card-image">
+                    <img src="{% static 'images/lifestyle-hero.png' %}" alt="Blog Post">
+                    <span class="category">Design</span>
+                </div>
+                <div class="card-content">
+                    <div class="card-meta">Dec 07, 2025 • 3 min read</div>
+                    <h3><a href="#">The Psychology of Color</a></h3>
+                    <p>How color choices impact user behavior and conversion rates.</p>
+                </div>
+            </article>
+            {% endif %}
+        </main>
+        {% include 'includes/pagination.html' %}
+    </div>
+
+    <aside class="sidebar">
+        <div class="widget">
+            <h4>Popular Categories</h4>
+            <ul class="cat-list">
+                {% for category in categories %}
+                <li><a href="{% url 'category_posts' category.slug %}"><span>{{ category.name }}</span> <span
+                            class="badge-count">{{ category.count }}</span></a></li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="widget">
+            <h4>Lifestyle Topics</h4>
+            <ul class="cat-list">
+                <li><a href="#">Healthy Living <span>(12)</span></a></li>
+                <li><a href="#">Travel Tips <span>(15)</span></a></li>
+                <li><a href="#">Quick Recipes <span>(10)</span></a></li>
+                <li><a href="#">Home Workouts <span>(8)</span></a></li>
+                <li><a href="#">Home Decor Ideas <span>(9)</span></a></li>
+                <li><a href="#">Work-Life Balance <span>(7)</span></a></li>
+            </ul>
+        </div>
+
+        <div class="widget">
+            <h4>Popular Tags</h4>
+            <ul class="trending-list">
+                <li><a href="#">#StartupLife</a></li>
+                <li><a href="#">#MoneyManagement</a></li>
+                <li><a href="#">#SideHustle</a></li>
+                <li><a href="#">#RemoteWork</a></li>
+                <li><a href="#">#ContentCreation</a></li>
+            </ul>
+        </div>
+
+
+
+        {% if user.is_authenticated %}
+        <div class="widget">
+            <h4>Quick Actions</h4>
+            <ul class="action-list">
+                <li><a href="{% url 'create_post' %}" class="btn-primary">Create New Post</a></li>
+                <li><a href="{% url 'my_posts' %}">My Posts</a></li>
+            </ul>
+        </div>
+        {% else %}
+        <div class="widget newsletter-widget">
+            <h4>Join the Newsletter</h4>
+            <p>Get the latest updates directly in your inbox.</p>
+            <form action="{% url 'subscribe' %}" method="post">
+                {% csrf_token %}
+                <input type="email" name="email" placeholder="Your email address" required>
+                <button type="submit" class="btn-primary">Sign Up</button>
+            </form>
+        </div>
+        {% endif %}
+    </aside>
+</div>
+
+{% endblock %}

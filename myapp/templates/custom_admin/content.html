@@ -1,0 +1,17 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block admin_content %}
+<div class="admin-section">
+    <div class="section-header">
+        <h2>Content Management</h2>
+    </div>
+
+    <div style="background: white; padding: 3rem; border-radius: 12px; text-align: center; border: 1px dashed #e2e8f0;">
+        <i class="fas fa-tools" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
+        <h3 style="color: #64748b;">Content Management Tools</h3>
+        <p style="color: #94a3b8;">Manage Categories, Tags, and Static Pages here.</p>
+        <a href="{% url 'admin_categories' %}" class="btn-primary"
+            style="margin-top: 1rem; display: inline-block; text-decoration: none;">Manage Categories</a>
+    </div>
+</div>
+{% endblock %}

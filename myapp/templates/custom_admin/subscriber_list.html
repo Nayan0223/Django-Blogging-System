@@ -1,0 +1,39 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block admin_content %}
+<div class="admin-section">
+    <div class="section-header">
+        <h2>Subscribers</h2>
+        <!-- Simple search form if you want -->
+        <form method="get" style="display:flex; align-items:center;">
+            <input type="text" name="q" placeholder="Search emails..." value="{{ search_query|default:'' }}"
+                style="padding:8px 12px; border:1px solid #e2e8f0; border-radius:6px;">
+        </form>
+    </div>
+
+    <div class="table-container">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Email</th>
+                    <th>Subscribed Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for subscriber in subscribers %}
+                <tr>
+                    <td>#{{ subscriber.id|stringformat:"03d" }}</td>
+                    <td><a href="mailto:{{ subscriber.email }}" style="text-decoration: none; color: inherit;">{{ subscriber.email }}</a></td>
+                    <td>{{ subscriber.subscribed_at|date:"M d, Y" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" style="text-align: center; padding: 2rem;">No subscribers yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin | Dashboard</title>
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body class="admin-body">
+
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-brand">
+                <h2>Admin</h2>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="{% url 'admin_dashboard' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+                    <i class="fas fa-gauge"></i> Dashboard
+                </a>
+                <a href="{% url 'admin_users' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'admin_users' %}active{% endif %}">
+                    <i class="fas fa-users"></i> User Management
+                </a>
+                <a href="{% url 'admin_post_list' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'admin_post_list' %}active{% endif %}">
+                    <i class="fas fa-layer-group"></i> Post Control
+                </a>
+        
+
+                <a href="{% url 'admin_comments' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'admin_comments' %}active{% endif %}">
+                    <i class="fas fa-comments"></i> Comment Moderation
+                </a>
+                <a href="{% url 'subscriber_list' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'subscriber_list' %}active{% endif %}">
+                    <i class="fas fa-envelope"></i> Subscribers
+                </a>
+                <a href="{% url 'admin_content' %}"
+                    class="nav-item {% if request.resolver_match.url_name == 'admin_content' %}active{% endif %}">
+                    <i class="fas fa-file-alt"></i> Content Management
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="admin-user">
+                    <img src="https://ui-avatars.com/api/?name={{ user.username }}&background=6366f1&color=fff"
+                        alt="Admin">
+                    <div class="user-info">
+                        <strong>{{ user.username }}</strong>
+                        <span>Administrator</span>
+                    </div>
+                    <div style="display:flex; gap:5px;">
+                        <a href="{% url 'edit_profile' %}" class="logout-btn" title="Edit Profile"><i
+                                class="fas fa-cog"></i></a>
+                        <a href="{% url 'logout' %}" class="logout-btn" title="Logout"
+                            onclick="return confirm('Are you sure you want to logout?');"><i
+                                class="fas fa-sign-out-alt"></i></a>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            {% if messages %}
+            <div class="messages-container">
+                {% for message in messages %}
+                <div class="message message-{{ message.tags }}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% block admin_content %}{% endblock %}
+        </main>
+    </div>
+
+</body>
+
+</html>

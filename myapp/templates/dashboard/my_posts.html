@@ -1,0 +1,42 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block dashboard_content %}
+<div class="container">
+    <div class="page-header">
+        <h1>My Posts</h1>
+        <a href="{% url 'create_post' %}" class="btn-primary">Create New Post</a>
+    </div>
+
+    {% if posts %}
+    <div class="posts-list">
+        {% for post in posts %}
+        <div class="post-item">
+            <div class="post-item-content">
+                <h3><a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a></h3>
+                <div class="post-meta">
+                    <span>Created: {{ post.created_at|date:"M d, Y" }}</span>
+                    <span class="status-badge {% if post.is_published %}published{% else %}draft{% endif %}">
+                        {% if post.is_published %}Published{% else %}Draft{% endif %}
+                    </span>
+                </div>
+                <p>{{ post.content|truncatewords:30 }}</p>
+            </div>
+
+            <div class="post-item-actions">
+                <a href="{% url 'edit_post' post.pk %}" class="btn-secondary">Edit</a>
+                {% if user.is_superuser %}
+                <a href="{% url 'delete_post' post.pk %}" class="btn-danger">Delete</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% include 'includes/pagination.html' %}
+    {% else %}
+    <div class="no-posts">
+        <p>You haven't created any posts yet.</p>
+        <a href="{% url 'create_post' %}" class="btn-primary">Create Your First Post</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock dashboard_content %}

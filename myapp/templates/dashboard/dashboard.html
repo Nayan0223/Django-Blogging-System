@@ -1,0 +1,70 @@
+{% extends 'dashboard/base_dashboard.html' %}
+
+{% block dashboard_content %}
+<div class="container dashboard-container">
+    <div class="dashboard-header">
+        <h1>Welcome, {{ user.first_name|default:user.username }}!</h1>
+        <p class="subtitle">Manage your posts and account settings</p>
+    </div>
+
+    <div class="dash-card">
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <div class="stat-value">{{ total_posts }}</div>
+                <div class="stat-label">Total Posts</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ published_posts }}</div>
+                <!-- simple filter check, or passed from view -->
+                <div class="stat-label">Published</div>
+            </div>
+            <!-- Add more stats as needed -->
+        </div>
+    </div>
+
+    <div class="dashboard-actions">
+        <h2>Quick Actions</h2>
+        <div class="action-grid">
+            <a href="{% url 'create_post' %}" class="action-card primary">
+                <i class="fas fa-plus-circle"></i>
+                <span>Create New Post</span>
+            </a>
+            <a href="{% url 'my_posts' %}" class="action-card">
+                <i class="fas fa-list"></i>
+                <span>My Posts</span>
+            </a>
+            <a href="{% url 'home' %}" class="action-card">
+                <i class="fas fa-home"></i>
+                <span>View Site</span>
+            </a>
+            <a href="{% url 'edit_profile' %}" class="action-card secondary">
+                <i class="fas fa-user-edit"></i>
+                <span>Edit Profile</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="recent-activity">
+        <h2>Recent Posts</h2>
+        {% if recent_posts %}
+        <div class="activity-list">
+            {% for post in recent_posts %}
+            <div class="activity-item">
+                <span class="activity-title">{{ post.title }}</span>
+                <span class="activity-date">{{ post.created_at|date:"M d, Y" }}</span>
+                <span class="activity-status {% if post.is_published %}published{% else %}draft{% endif %}">
+                    {% if post.is_published %}Published{% else %}Draft{% endif %}
+                </span>
+                <a href="{% url 'edit_post' post.pk %}" class="edit-link">Edit</a>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="view-all-link">
+            <a href="{% url 'my_posts' %}">View All Posts &rarr;</a>
+        </div>
+        {% else %}
+        <p class="no-activity">No posts yet. <a href="{% url 'create_post' %}">Create one now!</a></p>
+        {% endif %}
+    </div>
+</div>
+{% endblock dashboard_content %}

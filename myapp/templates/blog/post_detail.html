@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="modern-article-wrapper">
+
+    <!-- Hero Header -->
+    <header class="modern-hero">
+        <a href="{% url 'category_posts' post.category.slug %}" class="modern-hero-category">
+            {{ post.category.name|default:"General" }}
+        </a>
+        <h1 class="modern-hero-title">{{ post.title }}</h1>
+
+        <div class="modern-hero-meta">
+            <!-- Author -->
+            <div class="meta-item">
+                <a href="{% url 'user_public_profile' post.author.username %}"
+                    style="display:flex; align-items:center; text-decoration:none; color:inherit;">
+                    {% if post.author.profile.profile_image %}
+                    <img src="{{ post.author.profile.profile_image.url }}" alt="{{ post.author.username }}"
+                        class="meta-avatar">
+                    {% else %}
+                    <img src="https://ui-avatars.com/api/?name={{ post.author.username }}&background=random"
+                        alt="{{ post.author.username }}" class="meta-avatar">
+                    {% endif %}
+                    <span style="font-weight: 600; color: var(--text-primary); margin-left: 0.5rem;">
+                        {{post.author.username }}</span>
+                </a>
+            </div>
+
+            <span style="color: #cbd5e1;">|</span>
+
+            <!-- Date -->
+            <div class="meta-item">
+                <span>{{ post.created_at|date:"M d, Y" }}</span>
+            </div>
+
+            <span style="color: #cbd5e1;">|</span>
+
+            <!-- Read Time -->
+            <div class="meta-item">
+                <span><i class="far fa-clock"></i> 3 min read</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Featured Image -->
+    {% if post.image %}
+    <div class="modern-featured-image">
+        <img src="{{ post.image.url }}" alt="{{ post.title }}">
+    </div>
+    {% endif %}
+
+    <!-- Content & Share Grid -->
+    <div class="modern-content-container">
+
+        <!-- Post Body -->
+        <article class="modern-body-text">
+            {{ post.content|safe }}
+        </article>
+
+        <!-- Like Button -->
+        <div class="modern-like-bar">
+            {% if user.is_authenticated %}
+                <form method="post" action="{% url 'like_post' post.pk %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="like-btn {% if user in post.likes.all %}liked{% endif %}">
+                        <i class="{% if user in post.likes.all %}fas{% else %}far{% endif %} fa-heart"></i>
+                        <span>{{ post.total_likes }} {{ post.total_likes|pluralize:"Like,Likes" }}</span>
+                    </button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}?next={{ request.path }}" class="like-btn">
+                    <i class="far fa-heart"></i>
+                    <span>{{ post.total_likes }} {{ post.total_likes|pluralize:"Like,Likes" }}</span>
+                </a>
+            {% endif %}
+        </div>
+
+        <!-- Interactive Share Bar -->
+        <div class="modern-share-bar">
+            <div class="share-left">
+                <h4>Share this post</h4>
+            </div>
+            <div class="share-icons">
+                <a href="https://twitter.com/intent/tweet?text={{ post.title }}&url={{ request.build_absolute_uri }}"
+                    target="_blank" class="share-btn-modern bg-twitter"><i class="fab fa-twitter"></i></a>
+                <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ request.build_absolute_uri }}"
+                    target="_blank" class="share-btn-modern bg-linkedin"><i class="fab fa-linkedin-in"></i></a>
+                <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank"
+                    class="share-btn-modern bg-facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://api.whatsapp.com/send?text={{ post.title }}%20{{ request.build_absolute_uri }}"
+                    target="_blank" class="share-btn-modern bg-whatsapp" style="background: #25d366;"><i
+                        class="fab fa-whatsapp"></i></a>
+                <button onclick="copyToClipboard('{{ request.build_absolute_uri }}')" class="share-btn-modern bg-copy"
+                    style="border:none; cursor:pointer;"><i class="fas fa-link"></i></button>
+            </div>
+        </div>
+        <div id="copy-toast" class="toast">Link copied!</div>
+
+        <!-- Comments Section -->
+        <section class="modern-comments-section">
+            <div class="comments-header">
+                <h3>Comments ({{ comments.count }})</h3>
+            </div>
+
+            <!-- Comment Input -->
+            <div class="comment-input-card">
+                <div class="user-avatar-current">
+                    {% if user.is_authenticated %}
+                    {% if user.profile.profile_image %}
+                    <img src="{{ user.profile.profile_image.url }}"
+                        style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
+                    {% else %}
+                    {{ user.username|slice:":1"|upper }}
+                    {% endif %}
+                    {% else %}
+                    <i class="fas fa-user"></i>
+                    {% endif %}
+                </div>
+
+                <div class="comment-form-wrapper">
+                    {% if user.is_authenticated %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <div style="margin-bottom: 0.5rem; font-weight: 600;">Leave a comment as {{ user.username }}
+                        </div>
+                        {{ form.content }} <!-- Ensure this renders a plain textarea or we style it -->
+                        <button type="submit" class="btn-submit-modern">Post Comment</button>
+                    </form>
+                    {% else %}
+                    <div class="guest-mode">
+                        <h4 style="margin-bottom: 0.5rem;">Leave a comment as Guest</h4>
+                        <form method="post" class="modern-form">
+                            {% csrf_token %}
+                            <div class="form-grid">
+                                <div class="input-with-icon">
+                                    <i class="fas fa-user input-icon"></i>
+                                    {{ form.guest_name }}
+                                </div>
+                                <div class="input-with-icon">
+                                    <i class="fas fa-envelope input-icon"></i>
+                                    {{ form.guest_email }}
+                                </div>
+                            </div>
+                            <div class="input-with-icon full-width">
+                                <i class="fas fa-pen input-icon icon-top"></i>
+                                {{ form.content }}
+                            </div>
+                            <button type="submit" class="btn-submit-modern">
+                                <i class="fas fa-paper-plane"></i> Post Comment
+                            </button>
+                        </form>
+                        <p style="margin-top: 1rem; font-size: 0.9rem; color: #64748b;">Or <a
+                                href="{% url 'login' %}?next={{ request.path }}"
+                                style="color: #6366f1; text-decoration:none;">login</a> to comment with your profile.
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="comments-list-modern">
+                {% for comment in comments %}
+                {% include 'blog/includes/comment_node.html' with comment=comment %}
+                {% empty %}
+                <div style="text-align: center; color: #94a3b8; padding: 2rem;">
+                    <i class="far fa-comment-dots" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                    <p>No comments yet. Be the first to share your thoughts!</p>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<script>
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            const toast = document.getElementById('copy-toast');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }).catch(err => {
+            console.error('Failed to copy: ', err);
+        });
+    }
+
+    function toggleReplyForm(commentId) {
+        const form = document.getElementById(`reply-form-${commentId}`);
+        if (form.style.display === 'none') {
+            form.style.display = 'block';
+        } else {
+            form.style.display = 'none';
+        }
+    }
+
+    // Auto-style django form fields if needed
+    document.addEventListener("DOMContentLoaded", function () {
+        const textareas = document.querySelectorAll('textarea');
+        textareas.forEach(t => t.classList.add('modern-textarea'));
+        const inputs = document.querySelectorAll('input[type="text"], input[type="email"]');
+        inputs.forEach(i => {
+            // Avoid overriding styles if already set cleanly by class
+            if (!i.classList.contains('form-control')) {
+                i.style.width = '100%';
+                i.style.padding = '0.75rem';
+                i.style.border = '1px solid #e2e8f0';
+                i.style.borderRadius = '8px';
+                i.style.marginBottom = '1rem';
+            }
+        });
+    });
+</script>
+{% endblock %}

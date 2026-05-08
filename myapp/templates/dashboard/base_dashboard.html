@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container dashboard-layout-container">
+    <!-- DASHBOARD SIDEBAR -->
+    <aside class="dash-sidebar">
+        <div class="user-profile-summary">
+            <div class="profile-avatar">
+                <!-- Fallback avatar if no user profile image -->
+                <span>{{ user.first_name|first|default:user.username|first|upper }}</span>
+            </div>
+            <h3>{{ user.first_name|default:user.username }}</h3>
+            <p class="user-role">Author & Content Creator</p>
+
+            <div class="user-mini-stats">
+                <div class="mini-stat">
+                    <strong>{{ user.post_set.count }}</strong>
+                    <span>Posts</span>
+                </div>
+                <div class="mini-stat">
+                    <!-- Assuming comment_set or similar, referencing User model relation -->
+                    <strong>{{ user.comment_set.count }}</strong>
+                    <span>Comments</span>
+                </div>
+            </div>
+        </div>
+
+        <nav class="dash-nav">
+            <a href="{% url 'dashboard' %}"
+                class="dash-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                <i class="fas fa-home"></i> Dashboard
+            </a>
+            <a href="{% url 'my_posts' %}"
+                class="dash-link {% if request.resolver_match.url_name == 'my_posts' %}active{% endif %}">
+                <i class="fas fa-file-alt"></i> My Posts
+            </a>
+            <a href="{% url 'create_post' %}"
+                class="dash-link {% if request.resolver_match.url_name == 'create_post' %}active{% endif %}">
+                <i class="fas fa-plus-circle"></i> Create New
+            </a>
+            <a href="{% url 'my_comments' %}"
+                class="dash-link {% if request.resolver_match.url_name == 'my_comments' %}active{% endif %}">
+                <i class="fas fa-comments"></i> My Comments
+            </a>
+            <!-- Placeholder for Settings -->
+            
+        </nav>
+    </aside>
+
+    <!-- MAIN DASHBOARD CONTENT -->
+    <main class="dash-content">
+        {% block dashboard_content %}{% endblock %}
+    </main>
+</div>
+{% endblock %}

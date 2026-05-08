@@ -1,0 +1,45 @@
+<nav class="navbar">
+    <div class="container nav-container">
+        <a href="{% url 'home' %}" class="logo">Blogs.</a>
+
+        <ul class="nav-links">
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'technology' %}">Technology</a></li>
+            <li><a href="{% url 'lifestyle' %}">Lifestyle</a></li>
+            <li><a href="{% url 'image_gallery' %}">Gallery</a></li>
+            <li><a href="{% url 'about' %}">About</a></li>
+        </ul>
+
+        <div class="nav-actions">
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+            <form action="{% url 'search_posts' %}" method="get" class="nav-search-form"
+                style="display:flex; align-items:center;">
+                <input type="text" name="q" placeholder="Search..."
+                    style="padding: 6px 12px; border-radius: 20px; border: 1px solid var(--border-color); font-size: 0.9rem;"
+                    value="{{ query }}">
+            </form>
+
+            {% if user.is_authenticated %}
+            <div style="display: flex; align-items: center; gap: 10px; margin-right: 15px;">
+                {% if user.profile.profile_image %}
+                <img src="{{ user.profile.profile_image.url }}" alt="{{ user.username }}"
+                    style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
+                {% else %}
+                <img src="https://ui-avatars.com/api/?name={{ user.username }}&background=random&size=32"
+                    alt="{{ user.username }}" style="width: 32px; height: 32px; border-radius: 50%;">
+                {% endif %}
+                <span style="color: var(--text-color);">{{ user.username }}</span>
+            </div>
+            {% if user.is_superuser %}
+            <a href="{% url 'admin_dashboard' %}" class="btn-link-nav">Dashboard</a>
+            {% else %}
+            <a href="{% url 'dashboard' %}" class="btn-link-nav">Dashboard</a>
+            {% endif %}
+            <a href="{% url 'logout' %}" class="btn-link-nav">Logout</a>
+            {% else %}
+            <a href="{% url 'login' %}" class="btn-link-nav">Login</a>
+            <a href="{% url 'register' %}" class="btn-primary">Register</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>

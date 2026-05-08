@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<header class="hero lifestyle-hero">
+    <div class="container hero-container">
+        <div class="hero-content">
+            {% if featured_post %}
+            <span class="tag">Lifestyle</span>
+            <h1>{{ featured_post.title }}</h1>
+            <p>{{ featured_post.content|striptags|truncatewords:25 }}</p>
+            <a href="{% url 'post_detail' featured_post.pk %}" class="btn-text">Read Article <i
+                    class="fas fa-arrow-right"></i></a>
+            {% else %}
+            <span class="tag">Lifestyle</span>
+            <h1>Live Well, Travel Often, Create Always</h1>
+            <p>Discover inspiration for a balanced life. From wellness tips to travel adventures, explore stories that
+                celebrate the art of living beautifully and authentically.</p>
+            <a href="#posts" class="btn-text">Explore Stories <i class="fas fa-arrow-right"></i></a>
+            {% endif %}
+        </div>
+        <div class="hero-image">
+            {% if featured_post %}
+            <img src="{% if featured_post.image %}{{ featured_post.image.url }}{% else %}{% static 'images/lifestyle-hero.png' %}{% endif %}"
+                alt="{{ featured_post.title }}">
+            {% else %}
+            <img src="{% static 'images/lifestyle-hero.png' %}" alt="Lifestyle">
+            {% endif %}
+        </div>
+    </div>
+</header>
+
+<div class="container main-layout" id="posts">
+    <main class="blog-grid">
+        {% if posts %}
+        {% for post in posts %}
+        <article class="card lifestyle-card">
+            <div class="card-image">
+                <img src="{% if post.image %}{{ post.image.url }}{% else %}{% static 'images/default-post.png' %}{% endif %}"
+                    alt="{{ post.title }}">
+                <span class="category">{{ post.get_category_display }}</span>
+            </div>
+            <div class="card-content">
+                <div class="card-meta">{{ post.created_at|date:"M d, Y" }} • By <a
+                        href="{% url 'user_public_profile' post.author.username %}"
+                        style="text-decoration: none; color: inherit;">{{ post.author.username }}</a></div>
+                <h3><a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a></h3>
+                <p>{{ post.content|striptags|truncatewords:25 }}</p>
+                <a href="{% url 'post_detail' post.pk %}" class="read-more">Read More →</a>
+            </div>
+        </article>
+        {% endfor %}
+        {% else %}
+        <div class="no-posts">
+            <p>No lifestyle stories yet. Be the first to share one!</p>
+        </div>
+        {% endif %}
+    </main>
+
+    <aside class="sidebar">
+        <div class="widget">
+            <h4>Lifestyle Topics</h4>
+            <ul class="cat-list">
+                <li><a href="#">Wellness <span>(12)</span></a></li>
+                <li><a href="#">Travel <span>(15)</span></a></li>
+                <li><a href="#">Food & Recipes <span>(10)</span></a></li>
+                <li><a href="#">Fitness <span>(8)</span></a></li>
+                <li><a href="#">Home & Decor <span>(9)</span></a></li>
+                <li><a href="#">Work-Life Balance <span>(7)</span></a></li>
+            </ul>
+        </div>
+
+        <div class="widget">
+            <h4>Popular Tags</h4>
+            <ul class="trending-list">
+                <li><a href="#">#MindfulLiving</a></li>
+                <li><a href="#">#TravelTips</a></li>
+                <li><a href="#">#HealthyLiving</a></li>
+                <li><a href="#">#HomeDesign</a></li>
+                <li><a href="#">#SelfCare</a></li>
+            </ul>
+        </div>
+
+        {% if user.is_authenticated %}
+        <div class="widget">
+            <h4>Quick Actions</h4>
+            <ul class="action-list">
+                <li><a href="{% url 'create_post' %}" class="btn-primary">Share Your Story</a></li>
+                <li><a href="{% url 'my_posts' %}">My Posts</a></li>
+            </ul>
+        </div>
+        {% else %}
+        <div class="widget newsletter-widget">
+            <h4>Join Our Community</h4>
+            <p>Get weekly inspiration for living your best life delivered straight to your inbox.</p>
+            <form>
+                <input type="email" placeholder="Your email address">
+                <button type="button" class="btn-primary">Subscribe</button>
+            </form>
+        </div>
+        {% endif %}
+    </aside>
+</div>
+
+{% endblock %}

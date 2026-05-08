@@ -1,0 +1,271 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block admin_content %}
+<div class="admin-section" style="max-width: 800px; margin: 0 auto;">
+
+    <!-- Header -->
+    <div class="section-header"
+        style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h2 style="font-family: 'Playfair Display', serif; font-size: 2rem; color: #1e293b; margin-bottom: 0.5rem;">
+                Add New User</h2>
+            <p style="color: #64748b;">Create a new user account.</p>
+        </div>
+        <a href="{% url 'admin_users' %}"
+            style="display: flex; align-items: center; gap: 0.5rem; color: #64748b; text-decoration: none; font-weight: 500; transition: color 0.2s;">
+            <i class="fas fa-arrow-left"></i> Back to Users
+        </a>
+    </div>
+
+    <!-- Main Card -->
+    <div
+        style="background: white; border-radius: 16px; padding: 2.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); border: 1px solid #f1f5f9;">
+
+        <form method="POST">
+            {% csrf_token %}
+
+            {% if form.errors %}
+            <div
+                style="background-color: #fee2e2; border: 1px solid #ef4444; color: #b91c1c; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">
+                <p style="font-weight: bold; margin-bottom: 0.5rem;">Please correct the following errors:</p>
+                <ul style="list-style-type: disc; padding-left: 1.5rem;">
+                    {% for field in form %}
+                    {% for error in field.errors %}
+                    <li>{{ field.label }}: {{ error }}</li>
+                    {% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <!-- User Info Section -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2.5rem;">
+                <!-- Username -->
+                <div>
+                    <label
+                        style="display: block; margin-bottom: 0.75rem; color: #334155; font-weight: 600; font-size: 0.95rem;">
+                        {{ form.username.label }}
+                    </label>
+                    <div style="position: relative;">
+                        <span
+                            style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #94a3b8;">
+                            <i class="fas fa-user"></i>
+                        </span>
+                        {{ form.username }}
+                    </div>
+                    <small style="color: #64748b;">{{ form.username.help_text }}</small>
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label
+                        style="display: block; margin-bottom: 0.75rem; color: #334155; font-weight: 600; font-size: 0.95rem;">
+                        {{ form.email.label }}
+                    </label>
+                    <div style="position: relative;">
+                        <span
+                            style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #94a3b8;">
+                            <i class="fas fa-envelope"></i>
+                        </span>
+                        {{ form.email }}
+                    </div>
+                </div>
+
+                <!-- First Name -->
+                <div>
+                    <label
+                        style="display: block; margin-bottom: 0.75rem; color: #334155; font-weight: 600; font-size: 0.95rem;">
+                        {{ form.first_name.label }}
+                    </label>
+                    <div style="position: relative;">
+                        {{ form.first_name }}
+                    </div>
+                </div>
+
+                <!-- Last Name -->
+                <div>
+                    <label
+                        style="display: block; margin-bottom: 0.75rem; color: #334155; font-weight: 600; font-size: 0.95rem;">
+                        {{ form.last_name.label }}
+                    </label>
+                    <div style="position: relative;">
+                        {{ form.last_name }}
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2.5rem;">
+                <!-- Password 1 -->
+                <div>
+                    <label
+                        style="display: block; margin-bottom: 0.75rem; color: #334155; font-weight: 600; font-size: 0.95rem;">
+                        {{ form.password1.label }}
+                    </label>
+                    <div style="position: relative;">
+                        <!-- Basic styling for password field since we don't have a widget defined in form but it renders as input -->
+                        <input type="password" name="password1" required id="id_password1"
+                            style="width: 100%; padding: 0.875rem 1rem; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 1rem; color: #1e293b; transition: all 0.2s; outline: none;"
+                            onfocus="this.style.borderColor='#4f46e5'; this.style.boxShadow='0 0 0 3px rgba(79, 70, 229, 0.1)';"
+                            onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none';">
+                    </div>
+                    <small style="color: #64748b;">{{ form.password1.help_text }}</small>
+                </div>
+
+                <!-- Password 2 -->
+                <div>
+                    <label
+                        style="display: block; margin-bottom: 0.75rem; color: #334155; font-weight: 600; font-size: 0.95rem;">
+                        {{ form.password2.label }}
+                    </label>
+                    <div style="position: relative;">
+                        <input type="password" name="password2" required id="id_password2"
+                            style="width: 100%; padding: 0.875rem 1rem; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 1rem; color: #1e293b; transition: all 0.2s; outline: none;"
+                            onfocus="this.style.borderColor='#4f46e5'; this.style.boxShadow='0 0 0 3px rgba(79, 70, 229, 0.1)';"
+                            onblur="this.style.borderColor='#cbd5e1'; this.style.boxShadow='none';">
+                    </div>
+                    <small style="color: #64748b;">{{ form.password2.help_text }}</small>
+                </div>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid #f1f5f9; margin-bottom: 2.5rem;">
+
+            <!-- Permissions Section -->
+            <div style="margin-bottom: 2.5rem;">
+                <h4 style="margin-bottom: 1.5rem; font-size: 1.1rem; color: #1e293b; font-weight: 700;">Permissions &
+                    Access</h4>
+
+                <div style="background: #f8fafc; border-radius: 12px; padding: 1.5rem; border: 1px solid #e2e8f0;">
+
+                    <!-- Active Logic -->
+                    <div
+                        style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+                        <div>
+                            <div style="font-weight: 600; color: #334155; margin-bottom: 0.25rem;">{{ form.is_active.label }}</div>
+                            <div style="font-size: 0.9rem; color: #64748b;">{{ form.is_active.help_text }}</div>
+                        </div>
+                        <label class="switch"
+                            style="position: relative; display: inline-block; width: 50px; height: 26px;">
+                            {{ form.is_active }}
+                            <span class="slider"
+                                style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .4s; border-radius: 34px;"></span>
+                            <span class="slider-before"
+                                style="position: absolute; content: ''; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;"></span>
+                        </label>
+                    </div>
+
+                    <hr style="border: 0; border-top: 1px solid #e2e8f0; margin-bottom: 1.5rem;">
+
+                    <!-- Staff Status -->
+                    <div
+                        style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+                        <div>
+                            <div style="font-weight: 600; color: #334155; margin-bottom: 0.25rem;">{{ form.is_staff.label }}</div>
+                            <div style="font-size: 0.9rem; color: #64748b;">{{ form.is_staff.help_text }}</div>
+                        </div>
+                        <label class="switch"
+                            style="position: relative; display: inline-block; width: 50px; height: 26px;">
+                            {{ form.is_staff }}
+                            <span class="slider"
+                                style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .4s; border-radius: 34px;"></span>
+                            <span class="slider-before"
+                                style="position: absolute; content: ''; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;"></span>
+                        </label>
+                    </div>
+
+                    <hr style="border: 0; border-top: 1px solid #e2e8f0; margin-bottom: 1.5rem;">
+
+                    <!-- Superuser Logic -->
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <div>
+                            <div style="font-weight: 600; color: #334155; margin-bottom: 0.25rem;">{{ form.is_superuser.label }}</div>
+                            <div style="font-size: 0.9rem; color: #64748b;">{{ form.is_superuser.help_text }}</div>
+                        </div>
+                        <label class="switch"
+                            style="position: relative; display: inline-block; width: 50px; height: 26px;">
+                            {{ form.is_superuser }}
+                            <span class="slider"
+                                style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .4s; border-radius: 34px;"></span>
+                            <span class="slider-before"
+                                style="position: absolute; content: ''; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%;"></span>
+                        </label>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                <button type="submit" class="btn-primary"
+                    style="padding: 0.875rem 2rem; background: #4f46e5; color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; transition: background 0.2s; font-size: 1rem;">
+                    Create User
+                </button>
+                <a href="{% url 'admin_users' %}"
+                    style="padding: 0.875rem 1.5rem; color: #64748b; text-decoration: none; font-weight: 500;">Cancel</a>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<style>
+    /* Inline toggle styles for the switch */
+    input[type="checkbox"] {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    input:checked+.slider {
+        background-color: #4f46e5 !important;
+    }
+
+
+    /* Creating the 'before' element via CSS block in file to ensure it works */
+    .slider-before {
+        position: absolute;
+        height: 20px;
+        width: 20px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+    input:checked~.slider-before {
+        transform: translateX(24px);
+    }
+
+    /* Ensure form fields match the design */
+    #id_username,
+    #id_email,
+    #id_first_name,
+    #id_last_name {
+        width: 100%;
+        padding: 0.875rem 1rem 0.875rem 1rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        font-size: 1rem;
+        color: #1e293b;
+        transition: all 0.2s;
+        outline: none;
+    }
+
+    #id_username,
+    #id_email {
+        padding-left: 2.75rem;
+        /* Space for icon */
+    }
+
+    #id_username:focus,
+    #id_email:focus,
+    #id_first_name:focus,
+    #id_last_name:focus {
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+</style>
+{% endblock %}

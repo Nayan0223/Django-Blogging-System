@@ -1,0 +1,85 @@
+{% load static %}
+<div class="comment-wrapper">
+    <div class="comment-card" id="comment-{{ comment.id }}">
+        <div class="c-avatar-column">
+            <div class="user-avatar">
+                {% if comment.author.profile.profile_image %}
+                <img src="{{ comment.author.profile.profile_image.url }}" alt="{{ comment.author.username }}">
+                {% else %}
+                <div class="avatar-placeholder">
+                    {{ comment.author.username|slice:":1"|default:"G"|upper }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="comment-bubble">
+            <div class="comment-meta">
+                <div class="comment-author">
+                    {% if comment.author %}
+                    <a href="{% url 'user_public_profile' comment.author.username %}">{{ comment.author.username }}</a>
+                    {% if comment.author.is_superuser %}
+                    <span class="author-badge">Admin</span>
+                    {% endif %}
+                    {% else %}
+                    {{ comment.guest_name }} <span class="guest-badge">(Guest)</span>
+                    {% endif %}
+
+                    <span class="comment-time">
+                        <i class="far fa-clock"></i> {{ comment.created_at|timesince }} ago
+                    </span>
+                </div>
+
+                <div class="comment-actions">
+                    <button onclick="toggleReplyForm('{{ comment.id }}')" class="btn-reply">
+                        <i class="fas fa-reply"></i> Reply
+                    </button>
+
+                    {% if user.is_superuser %}
+                    <a href="{% url 'admin_delete_comment' comment.pk %}" class="btn-delete-comment"
+                        onclick="return confirm('Delete this comment?')">Delete</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="comment-text">
+                {{ comment.content|linebreaks }}
+            </div>
+
+            <!-- Reply Form (Hidden by default) -->
+            <div id="reply-form-{{ comment.id }}" class="reply-form" style="display: none;">
+                <form method="post" action="{% url 'post_detail' post.pk %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="parent_id" value="{{ comment.id }}">
+
+                    {% if user.is_authenticated %}
+                    <div class="reply-as">
+                        Replying as <strong>{{ user.username }}</strong>
+                    </div>
+                    {% else %}
+                    <div class="guest-inputs">
+                        <input type="text" name="guest_name" placeholder="Your Name" required class="form-control">
+                        <input type="email" name="guest_email" placeholder="Your Email" required class="form-control">
+                    </div>
+                    {% endif %}
+
+                    <textarea name="content" rows="3" class="form-control" placeholder="Write a reply..."
+                        required></textarea>
+
+                    <button type="submit" class="btn-submit-modern">
+                        Post Reply
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recursive Replies -->
+    {% if comment.replies.all %}
+    <div class="replies-wrapper">
+        {% for reply in comment.replies.all %}
+        {% include 'blog/includes/comment_node.html' with comment=reply %}
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>

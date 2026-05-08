@@ -1,0 +1,511 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- Gallery Page Styles -->
+<style>
+    .gallery-hero {
+        background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%);
+        padding: 5rem 0 3.5rem;
+        text-align: center;
+        color: #fff;
+    }
+
+    .gallery-hero .tag {
+        display: inline-block;
+        background: rgba(255, 255, 255, 0.15);
+        color: #e0e7ff;
+        font-size: 0.8rem;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 0.35rem 1rem;
+        border-radius: 100px;
+        margin-bottom: 1.2rem;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .gallery-hero h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 0.75rem;
+        color: #fff;
+    }
+
+    .gallery-hero p {
+        font-size: 1.15rem;
+        color: #c7d2fe;
+        max-width: 520px;
+        margin: 0 auto;
+    }
+
+    .gallery-stats {
+        display: flex;
+        justify-content: center;
+        gap: 2.5rem;
+        margin-top: 2rem;
+    }
+
+    .gallery-stats .stat {
+        text-align: center;
+    }
+
+    .gallery-stats .stat-num {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #fff;
+    }
+
+    .gallery-stats .stat-label {
+        font-size: 0.8rem;
+        color: #a5b4fc;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+
+    /* Masonry Grid */
+    .gallery-section {
+        padding: 3rem 0 4rem;
+    }
+
+    .masonry-grid {
+        columns: 4;
+        column-gap: 1rem;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+    }
+
+    @media (max-width: 1200px) {
+        .masonry-grid {
+            columns: 3;
+        }
+    }
+
+    @media (max-width: 860px) {
+        .masonry-grid {
+            columns: 2;
+        }
+    }
+
+    @media (max-width: 560px) {
+        .masonry-grid {
+            columns: 1;
+        }
+    }
+
+    .gallery-tile {
+        break-inside: avoid;
+        margin-bottom: 1rem;
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        cursor: pointer;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.10);
+        transition: transform 0.28s cubic-bezier(.22, .61, .36, 1), box-shadow 0.28s ease;
+    }
+
+    .gallery-tile:hover {
+        transform: translateY(-4px) scale(1.01);
+        box-shadow: 0 12px 36px rgba(0, 0, 0, 0.22);
+    }
+
+    .gallery-tile img {
+        width: 100%;
+        display: block;
+        border-radius: 12px;
+        object-fit: cover;
+    }
+
+    .gallery-tile-overlay {
+        position: absolute;
+        inset: 0;
+        border-radius: 12px;
+        background: linear-gradient(to top, rgba(15, 10, 40, 0.88) 0%, rgba(15, 10, 40, 0.0) 55%);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 1.2rem;
+        opacity: 0;
+        transition: opacity 0.28s ease;
+    }
+
+    .gallery-tile:hover .gallery-tile-overlay {
+        opacity: 1;
+    }
+
+    .gallery-tile-category {
+        display: inline-block;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: #fff;
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 0.2rem 0.6rem;
+        border-radius: 100px;
+        margin-bottom: 0.4rem;
+        width: fit-content;
+    }
+
+    .gallery-tile-title {
+        color: #fff;
+        font-size: 0.95rem;
+        font-weight: 700;
+        line-height: 1.3;
+        margin: 0;
+    }
+
+    .gallery-tile-meta {
+        color: #c7d2fe;
+        font-size: 0.78rem;
+        margin-top: 0.35rem;
+    }
+
+    /* Empty State */
+    .gallery-empty {
+        text-align: center;
+        padding: 5rem 2rem;
+        color: var(--text-muted, #94a3b8);
+    }
+
+    .gallery-empty i {
+        font-size: 3.5rem;
+        margin-bottom: 1rem;
+        opacity: 0.4;
+    }
+
+    .gallery-empty h3 {
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: var(--text-primary, #1e293b);
+    }
+
+    .gallery-empty p {
+        max-width: 360px;
+        margin: 0 auto;
+    }
+
+    /* Lightbox */
+    .lb-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: rgba(0, 0, 0, 0.88);
+        backdrop-filter: blur(6px);
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+    }
+
+    .lb-overlay.active {
+        display: flex;
+    }
+
+    .lb-box {
+        position: relative;
+        max-width: 900px;
+        width: 100%;
+        background: #18152e;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 32px 80px rgba(0, 0, 0, 0.6);
+        animation: lbIn 0.28s cubic-bezier(.22, .61, .36, 1);
+    }
+
+    @keyframes lbIn {
+        from {
+            opacity: 0;
+            transform: scale(0.93) translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+
+    .lb-img-wrap {
+        position: relative;
+        background: #0f0a28;
+    }
+
+    .lb-img-wrap img {
+        width: 100%;
+        max-height: 60vh;
+        object-fit: contain;
+        display: block;
+    }
+
+    .lb-close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: rgba(255, 255, 255, 0.15);
+        border: none;
+        color: #fff;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        font-size: 1.1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+        z-index: 2;
+    }
+
+    .lb-close:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    .lb-info {
+        padding: 1.4rem 1.8rem 1.6rem;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .lb-info-left {
+        flex: 1;
+    }
+
+    .lb-category {
+        display: inline-block;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: #fff;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 0.2rem 0.65rem;
+        border-radius: 100px;
+        margin-bottom: 0.6rem;
+    }
+
+    .lb-title {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: #fff;
+        margin: 0 0 0.3rem 0;
+        line-height: 1.3;
+    }
+
+    .lb-meta {
+        font-size: 0.82rem;
+        color: #a5b4fc;
+    }
+
+    .lb-read-btn {
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: #fff;
+        font-size: 0.9rem;
+        font-weight: 600;
+        padding: 0.65rem 1.4rem;
+        border-radius: 100px;
+        text-decoration: none;
+        white-space: nowrap;
+        flex-shrink: 0;
+        transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .lb-read-btn:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+    }
+
+    /* Gallery pagination */
+    .gallery-pagination {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 2.5rem;
+        flex-wrap: wrap;
+    }
+
+    .gallery-pagination a,
+    .gallery-pagination span {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 40px;
+        height: 40px;
+        padding: 0 0.9rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-decoration: none;
+        border: 1px solid var(--border-color, #e2e8f0);
+        color: var(--text-primary, #1e293b);
+        background: var(--bg-card, #fff);
+        transition: all 0.2s;
+    }
+
+    .gallery-pagination a:hover {
+        background: #6366f1;
+        color: #fff;
+        border-color: #6366f1;
+    }
+
+    .gallery-pagination .current-page {
+        background: #6366f1;
+        color: #fff;
+        border-color: #6366f1;
+    }
+</style>
+
+<!-- Hero -->
+<div class="gallery-hero">
+    <div class="container">
+        <span class="tag">✦ Visual Gallery</span>
+        <h1>Image Gallery</h1>
+        <p>Browse stunning cover images from across our blog</p>
+        <div class="gallery-stats">
+            <div class="stat">
+                <div class="stat-num">{{ page_obj.paginator.count }}</div>
+                <div class="stat-label">Images</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Gallery Grid -->
+<div class="gallery-section">
+    {% if posts %}
+    <div class="masonry-grid">
+        {% for post in posts %}
+        <div class="gallery-tile" data-img="{{ post.image.url }}" data-title="{{ post.title|escapejs }}"
+            data-category="{{ post.category.name|default:'General'|escapejs }}"
+            data-link="{% url 'post_detail' post.pk %}" data-date="{{ post.created_at|date:'M d, Y' }}"
+            data-author="{{ post.author.username|escapejs }}"
+            data-excerpt="{{ post.content|striptags|truncatechars:140 }}" data-views="{{ post.views_count }}"
+            data-likes="{{ post.total_likes }}">
+            <img src="{{ post.image.url }}" alt="{{ post.title }}" loading="lazy">
+            <div class="gallery-tile-overlay">
+                <span class="gallery-tile-category">{{ post.category.name|default:"General" }}</span>
+                <p class="gallery-tile-title">{{ post.title|truncatechars:60 }}</p>
+                <div class="gallery-tile-meta">{{ post.created_at|date:"M d, Y" }} &bull; {{ post.author.username }}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="gallery-pagination">
+        {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}"><i
+                class="fas fa-chevron-left"></i>
+        </a>{% endif %}
+        {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+        <span class="current-page">{{ num }}</span>
+        {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %} <a href="?page={{ num }}">
+            {{ num}}</a>
+            {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}"><i
+                    class="fas fa-chevron-right"></i></a>{% endif %}
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div style="max-width:1400px; margin:0 auto; padding:0 1.5rem;">
+        <div class="gallery-empty">
+            <i class="far fa-images"></i>
+            <h3>No Images Yet</h3>
+            <p>Once blog posts are published with cover images, they'll appear here in the gallery.</p>
+            <a href="{% url 'home' %}"
+                style="display:inline-block; margin-top:1.5rem; background:#6366f1; color:#fff; padding:0.65rem 1.5rem; border-radius:100px; text-decoration:none; font-weight:600;">←
+                Back to Home</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Lightbox -->
+<div class="lb-overlay" id="lightbox" onclick="closeLightboxOutside(event)">
+    <div class="lb-box" id="lb-box">
+        <div class="lb-img-wrap">
+            <img src="" alt="" id="lb-img">
+            <button class="lb-close" onclick="closeLightbox()" aria-label="Close"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="lb-info">
+            <div class="lb-info-left">
+                <span class="lb-category" id="lb-category">Category</span>
+                <h3 class="lb-title" id="lb-title">Post Title</h3>
+                <div class="lb-meta" id="lb-meta"></div>
+                <!-- Excerpt -->
+                <p id="lb-excerpt" style="font-size:0.88rem; color:#94a3b8; margin:0.6rem 0 0.8rem; line-height:1.6;">
+                </p>
+                <!-- Stats -->
+                <div id="lb-stats" style="display:flex; gap:1.2rem; font-size:0.82rem; color:#a5b4fc;">
+                    <span id="lb-views"><i class="fas fa-eye" style="margin-right:0.3rem;"></i><span></span></span>
+                    <span id="lb-likes"><i class="fas fa-heart"
+                            style="margin-right:0.3rem; color:#f472b6;"></i><span></span></span>
+                </div>
+            </div>
+            <button class="lb-read-btn" id="lb-link-btn" onclick="navigateToArticle()">
+                Read Article <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('.gallery-tile').forEach(function (tile) {
+        tile.addEventListener('click', function () {
+            openLightbox(
+                tile.dataset.img,
+                tile.dataset.title,
+                tile.dataset.category,
+                tile.dataset.link,
+                tile.dataset.date,
+                tile.dataset.author,
+                tile.dataset.excerpt || '',
+                tile.dataset.views || '0',
+                tile.dataset.likes || '0'
+            );
+        });
+    });
+
+    function openLightbox(imgUrl, title, category, link, date, author, excerpt, views, likes) {
+        window._articleLink = link;
+        document.getElementById('lb-img').src = imgUrl;
+        document.getElementById('lb-img').alt = title;
+        document.getElementById('lb-title').textContent = title;
+        document.getElementById('lb-category').textContent = category;
+        document.getElementById('lb-meta').textContent = date + ' · ' + author;
+        if (document.getElementById('lb-excerpt')) document.getElementById('lb-excerpt').textContent = excerpt;
+        if (document.getElementById('lb-views')) document.getElementById('lb-views').querySelector('span').textContent = views + ' views';
+        if (document.getElementById('lb-likes')) document.getElementById('lb-likes').querySelector('span').textContent = likes + ' likes';
+        document.getElementById('lightbox').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    function navigateToArticle() {
+        if (window._articleLink) window.location.href = window._articleLink;
+    }
+    function closeLightbox() {
+        document.getElementById('lightbox').classList.remove('active');
+        document.body.style.overflow = '';
+        setTimeout(function () { document.getElementById('lb-img').src = ''; }, 300);
+    }
+    function closeLightboxOutside(event) {
+        if (event.target === document.getElementById('lightbox')) closeLightbox();
+    }
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeLightbox();
+    });
+</script>
+
+{% endblock %}

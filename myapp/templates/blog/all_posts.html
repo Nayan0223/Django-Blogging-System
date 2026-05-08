@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- All Posts Header -->
+<header class="hero" style="padding: 4rem 0 3rem;">
+    <div class="container">
+        <div class="hero-content" style="text-align: center; max-width: 800px; margin: 0 auto;">
+            <span class="tag" style="margin-bottom: 1rem;">Explore</span>
+            <h1 style="font-size: 3rem; margin-bottom: 1rem;">All Stories</h1>
+            <p style="font-size: 1.25rem; color: var(--text-muted);">Discover the latest writing from our community of
+                creators.</p>
+        </div>
+    </div>
+</header>
+
+<div class="container main-layout">
+    <main class="blog-grid" style="width: 100%;">
+        {% if posts %}
+        {% for post in posts %}
+        <article class="card">
+            <div class="card-image">
+                <img src="{% if post.image %}{{ post.image.url }}{% else %}{% static 'images/default-post.png' %}{% endif %}"
+                    alt="{{ post.title }}">
+                <span class="category">{{ post.category.name|default:"Uncategorized" }}</span>
+            </div>
+            <div class="card-content">
+                <div class="card-meta">
+                    {{ post.created_at|date:"M d, Y" }} •
+                    <a href="{% url 'user_public_profile' post.author.username %}"
+                        style="text-decoration: none; color: inherit; font-weight: 600;">{{ post.author.username }}</a>
+                </div>
+                <h3><a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a></h3>
+                <p>{{ post.content|striptags|safe|truncatewords:20 }}</p>
+                <a href="{% url 'post_detail' post.pk %}" class="read-more">Read More →</a>
+            </div>
+        </article>
+        {% endfor %}
+        {% else %}
+        <div class="no-posts"
+            style="grid-column: 1 / -1; text-align: center; padding: 4rem; background: var(--bg-secondary); border-radius: var(--radius);">
+            <p>No posts found. Check back later!</p>
+        </div>
+        {% endif %}
+    </main>
+</div>
+
+{% endblock %}
