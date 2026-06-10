@@ -4,7 +4,7 @@ django-ckeditor>=6.7
 django-taggit>=5.0
 
 admin  passwrd: admin123
-some time admin paswrd change 
+sometime admin paswrd change 
 python manage.py changepassword <username>
 python manage.py changepassword admin
 
